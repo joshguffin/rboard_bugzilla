@@ -4,6 +4,9 @@ from reviewboard.reviews.signals import review_request_published
 
 
 class BugzillaExtension(Extension):
+
+    is_configurable = True
+
     metadata = {
         'Name': 'Bugzilla Integrator',
         'Summary': 'posts to bz whenever the bz field changes',
