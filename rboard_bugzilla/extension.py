@@ -9,6 +9,7 @@ from bzlib import bugzilla
 
 MESSAGE = "A code review associated to this bug has been created at {0}"
 
+
 def _extension_applies(review_request):
     if not review_request:
         return False
