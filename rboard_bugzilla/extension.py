@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib.sites.models import Site
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import SignalHook
 from reviewboard.reviews.signals import review_request_published
@@ -42,6 +43,18 @@ def _get_added_bug_list(review_request):
     return [bug for sublist in added for bug in sublist]
 
 
+def _construct_full_url(review_request):
+    '''
+    Obtain the domain and method from the current site and append the request url
+    '''
+    current_site = Site.objects.get_current()
+    siteconfig = current_site.config.get()
+    domain_method = siteconfig.get("site_domain_method")
+    review_url = review_request.get_absolute_url()
+
+    return "{0}://{1}{2}".format(domain_method, current_site.domain, review_url)
+
+
 class BugzillaExtension(Extension):
 
     is_configurable = True
@@ -76,7 +89,7 @@ class BugzillaExtension(Extension):
         Post updates to bugs that we haven't already posted to
         '''
         key = 'rboard_bugzilla_posted_bugs'
-        url = review_request.get_absolute_url()
+        url = _construct_full_url(review_request)
 
         posted_bugs = review_request.extra_data.get(key)
         posted_bugs = posted_bugs.split(',') if posted_bugs else []
@@ -100,7 +113,7 @@ class BugzillaExtension(Extension):
         review_request.save()
 
 
-    def _post_bug_to_bugzilla(self, url, bug):
+    def _post_bug_to_bugzilla(self, review_url, bug):
         '''
         Post data to bugzilla
         '''
@@ -112,5 +125,5 @@ class BugzillaExtension(Extension):
         bz_api = bugzilla.Bugzilla(base_url, username, password)
         bz_bug = bz_api.bug(bug)
 
-        bz_bug.add_comment(MESSAGE.format(url))
+        bz_bug.add_comment(MESSAGE.format(review_url))
         bz_bug.update()
