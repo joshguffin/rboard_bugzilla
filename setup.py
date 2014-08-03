@@ -13,6 +13,6 @@ setup(
     author='Josh Guffin',
     author_email='josh.guffin@gmail.com',
     packages=[PACKAGE],
-    install_requires=['bugzillatools>=0.4', 'ReviewBoard>=2.0.3'],
+    install_requires=['bugzillatools>=0.4'],
     entry_points={'reviewboard.extensions': [EXTENSION]}
 )
