@@ -15,8 +15,7 @@ def _extension_applies(review_request):
     if not review_request:
         return False
 
-    bugs = review_request.get_bug_list()
-    if not bugs:
+    if not review_request.repository:
         return False
 
     tracker_url = review_request.repository.bug_tracker
